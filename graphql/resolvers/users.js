@@ -1,26 +1,14 @@
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
-const {
-  UserInputError,
-  AuthenticationError
-} = require("apollo-server")
-const {
-  Op
-} = require("sequelize")
-const {
-  JWT_SECRET
-} = require("../../config/env.json")
-const {
-  User,
-  Message
-} = require("../../models/index")
+const { UserInputError, AuthenticationError } = require("apollo-server")
+const { Op } = require("sequelize")
+const { JWT_SECRET } = require("../../config/env.json")
+const { User, Message } = require("../../models/index")
 
 module.exports = {
   Query: {
     //{ user } is coming from context.user
-    getUsers: async (parent, args, {
-      user
-    }) => {
+    getUsers: async (parent, args, { user }) => {
       try {
         if (!user) throw new AuthenticationError("Unauthenticated")
         //get all users from database
@@ -36,7 +24,8 @@ module.exports = {
         //get messages for each user
         const allUserMessages = await Message.findAll({
           where: {
-            [Op.or]: [{
+            [Op.or]: [
+              {
                 from: user.username,
               },
               {
@@ -44,9 +33,7 @@ module.exports = {
               },
             ],
           },
-          order: [
-            ["createdAt", "DESC"]
-          ],
+          order: [["createdAt", "DESC"]],
         })
 
         //find the latest message for each user
@@ -65,15 +52,11 @@ module.exports = {
       }
     },
     login: async (parent, args) => {
-      const {
-        username,
-        password
-      } = args
+      const { username, password } = args
       let errors = {}
 
       try {
-        if (username.trim() === "")
-          errors.username = "Username is required"
+        if (username.trim() === "") errors.username = "Username is required"
         if (password === "") errors.password = "Password is required"
 
         //throw error if there are any errors in the errors object
@@ -105,10 +88,12 @@ module.exports = {
           })
         }
 
-        const token = jwt.sign({
+        const token = jwt.sign(
+          {
             username: username,
           },
-          JWT_SECRET, {
+          JWT_SECRET,
+          {
             expiresIn: 60 * 60,
           }
         )
@@ -125,21 +110,14 @@ module.exports = {
   },
   Mutation: {
     register: async (parent, args, context, info) => {
-      let {
-        username,
-        email,
-        password,
-        confirmPassword
-      } = args
+      let { username, email, password, confirmPassword } = args
       let errors = {}
 
       try {
         //validate input data
         if (email.trim() === "") errors.email = "Email is required"
-        if (username.trim() === "")
-          errors.username = "Username is required"
-        if (password.trim() === "")
-          errors.password = "Password is required"
+        if (username.trim() === "") errors.username = "Username is required"
+        if (password.trim() === "") errors.password = "Password is required"
         if (confirmPassword.trim() === "")
           errors.confirmPassword = "Password confirmation is required"
         if (password !== confirmPassword)
@@ -172,7 +150,7 @@ module.exports = {
         if (err.name === "SequelizeUniqueConstraintError") {
           err.errors.forEach(
             (e) =>
-            (errors[e.path.split("users.")[1]] = `${
+              (errors[e.path.split("users.")[1]] = `${
                 e.path.split("users.")[1]
               } is already taken`)
           )

@@ -4,23 +4,13 @@ const {
   ForbiddenError,
   withFilter,
 } = require("apollo-server")
-const {
-  Op
-} = require("sequelize")
-const {
-  User,
-  Message,
-  Reaction
-} = require("../../models/index")
+const { Op } = require("sequelize")
+const { User, Message, Reaction } = require("../../models/index")
 
 module.exports = {
   //{ from } comes from args, { user } comes from context
   Query: {
-    getMessages: async (parent, {
-      from
-    }, {
-      user
-    }) => {
+    getMessages: async (parent, { from }, { user }) => {
       try {
         if (!user) throw new AuthenticationError("Unauthenticated")
 
@@ -45,13 +35,13 @@ module.exports = {
               [Op.in]: usernames,
             },
           },
-          order: [
-            ["createdAt", "DESC"]
+          order: [["createdAt", "DESC"]],
+          include: [
+            {
+              model: Reaction,
+              as: "reactions",
+            },
           ],
-          include: [{
-            model: Reaction,
-            as: "reactions",
-          }, ],
         })
 
         return messages
@@ -63,13 +53,7 @@ module.exports = {
   },
   Mutation: {
     //{ to, content } come from args.to and args.content
-    sendMessage: async (parent, {
-      to,
-      content
-    }, {
-      user,
-      pubsub
-    }) => {
+    sendMessage: async (parent, { to, content }, { user, pubsub }) => {
       try {
         if (!user) throw new AuthenticationError("Unauthenticated")
 
@@ -110,14 +94,22 @@ module.exports = {
       }
     },
     // { uuid, content } come from args, { user, pubsub } come from context
-    reactToMessage: async (parent, {
-      uuid,
-      content
-    }, {
-      user,
-      pubsub
-    }) => {
-      const reactions = ["👍", "👎", "🙄", "🥶", "☠", "🍝", "🍦", "🍩", "😢", "😆", "😯", "❤️", "😡"]
+    reactToMessage: async (parent, { uuid, content }, { user, pubsub }) => {
+      const reactions = [
+        "👍",
+        "👎",
+        "🙄",
+        "🥶",
+        "☠",
+        "🍝",
+        "🍦",
+        "🍩",
+        "😢",
+        "😆",
+        "😯",
+        "❤️",
+        "😡",
+      ]
 
       try {
         //throw error if no reaction
@@ -178,18 +170,11 @@ module.exports = {
   Subscription: {
     newMessage: {
       subscribe: withFilter(
-        (parent, args, {
-          pubsub,
-          user
-        }) => {
+        (parent, args, { pubsub, user }) => {
           if (!user) throw new AuthenticationError("Unauthenticated")
           return pubsub.asyncIterator("NEW_MESSAGE")
         },
-        ({
-          newMessage
-        }, _, {
-          user
-        }) => {
+        ({ newMessage }, _, { user }) => {
           if (
             newMessage.from === user.username ||
             newMessage.to === user.username
@@ -203,18 +188,11 @@ module.exports = {
     },
     newReaction: {
       subscribe: withFilter(
-        (parent, args, {
-          pubsub,
-          user
-        }) => {
+        (parent, args, { pubsub, user }) => {
           if (!user) throw new AuthenticationError("Unauthenticated")
           return pubsub.asyncIterator("NEW_REACTION")
         },
-        async ({
-          newReaction
-        }, _, {
-          user
-        }) => {
+        async ({ newReaction }, _, { user }) => {
           const message = await newReaction.getMessage()
           if (message.from === user.username || message.to === user.username) {
             return true
