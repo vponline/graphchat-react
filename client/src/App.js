@@ -1,8 +1,34 @@
 import React from "react"
-import "./App.css"
+import { Container } from "react-bootstrap"
+import { BrowserRouter, Switch } from "react-router-dom"
+import "./styles.scss"
 
-function App() {
-  return <div>React app</div>
+import ApolloProvider from "./ApolloProvider"
+import { AuthProvider } from "./context/auth"
+import { MessageProvider } from "./context/message"
+import PrivateRoute from "./routing/PrivateRoute"
+import Home from "./components/layout/Home"
+import Register from "./components/Register"
+import Login from "./components/Login"
+
+const App = () => {
+  return (
+    <ApolloProvider>
+      <AuthProvider>
+        <MessageProvider>
+          <BrowserRouter>
+            <Container className="pt-5">
+              <Switch>
+                <PrivateRoute exact path="/" component={Home} authenticated />
+                <PrivateRoute path="/register" component={Register} guest />
+                <PrivateRoute exact path="/login" component={Login} guest />
+              </Switch>
+            </Container>
+          </BrowserRouter>
+        </MessageProvider>
+      </AuthProvider>
+    </ApolloProvider>
+  )
 }
 
 export default App
