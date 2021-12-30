@@ -1,1 +1,1 @@
-WIP: chat app wih sql
+WIP: chat app with sql
