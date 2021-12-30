@@ -110,7 +110,7 @@ module.exports = {
   },
   Mutation: {
     register: async (parent, args, context, info) => {
-      let { username, email, password, confirmPassword } = args
+      let { username, email, password, confirmPassword, imageUrl } = args
       let errors = {}
 
       try {
@@ -142,6 +142,7 @@ module.exports = {
           username,
           email,
           password,
+          imageUrl,
         })
         //return user as json to the client
         return user

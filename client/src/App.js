@@ -2,7 +2,6 @@ import React from "react"
 import { Container } from "react-bootstrap"
 import { BrowserRouter, Switch } from "react-router-dom"
 import "./styles.scss"
-
 import ApolloProvider from "./ApolloProvider"
 import { AuthProvider } from "./context/auth"
 import { MessageProvider } from "./context/message"
@@ -17,11 +16,11 @@ const App = () => {
       <AuthProvider>
         <MessageProvider>
           <BrowserRouter>
-            <Container className="pt-5">
+            <Container className="pt-sm-5">
               <Switch>
                 <PrivateRoute exact path="/" component={Home} authenticated />
                 <PrivateRoute path="/register" component={Register} guest />
-                <PrivateRoute exact path="/login" component={Login} guest />
+                <PrivateRoute path="/login" component={Login} guest />
               </Switch>
             </Container>
           </BrowserRouter>

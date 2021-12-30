@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import { gql, useLazyQuery } from "@apollo/client"
 import { Link } from "react-router-dom"
 import { Row, Col, Form, Button } from "react-bootstrap"
-
 import { useAuthDispatch } from "../context/auth"
 
 const LOGIN_USER = gql`
@@ -40,7 +39,7 @@ const Login = (props) => {
   }
 
   return (
-    <Row className="bg-container py-5 justify-content-center">
+    <Row className="bg-container py-5 justify-content-center mx-sm-auto">
       <Col sm={8} md={6} lg={4}>
         <h1 className="text-center">Login</h1>
         <Form onSubmit={onSubmitLogin}>

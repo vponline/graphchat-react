@@ -9,12 +9,14 @@ const REGISTER_USER = gql`
     $email: String!
     $password: String!
     $confirmPassword: String!
+    $imageUrl: String
   ) {
     register(
       username: $username
       email: $email
       password: $password
       confirmPassword: $confirmPassword
+      imageUrl: $imageUrl
     ) {
       username
       email
@@ -29,6 +31,7 @@ const Register = (props) => {
     username: "",
     password: "",
     confirmPassword: "",
+    imageUrl: "",
   })
 
   const [errors, setErrors] = useState({})
@@ -44,7 +47,7 @@ const Register = (props) => {
   }
 
   return (
-    <Row className="bg-container py-5 justify-content-center">
+    <Row className="bg-container py-5 justify-content-center mx-sm-auto">
       <Col sm={8} md={6} lg={4}>
         <h1 className="text-center">Register</h1>
         <Form onSubmit={onSubmitRegister}>
@@ -97,6 +100,19 @@ const Register = (props) => {
               className={errors.confirmPassword && "is-invalid"}
               onChange={(e) =>
                 setVariables({ ...variables, confirmPassword: e.target.value })
+              }
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label className={errors.imageUrl && "text-danger"}>
+              {errors.imageUrl ?? "Avatar (optional)"}
+            </Form.Label>
+            <Form.Control
+              type="text"
+              value={variables.imageUrl}
+              className={errors.imageUrl && "is-invalid"}
+              onChange={(e) =>
+                setVariables({ ...variables, imageUrl: e.target.value })
               }
             />
           </Form.Group>
